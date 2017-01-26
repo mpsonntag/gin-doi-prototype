@@ -1,5 +1,5 @@
-// Copyright (c) 2017, German Neuroinformatics Node (G-Node),
-//                     Michael Sonntag <dev@g-node.org>
+// Copyright (c) 2017, German Neuroinformatics Node (G-Node)
+//
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -10,6 +10,8 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"os"
 
 	"github.com/docopt/docopt-go"
 )
@@ -20,29 +22,54 @@ const (
 	status = "Alpha"
 )
 
-func versionString() string {
-	return fmt.Sprintf("gin-doi %d.%d %s", major, minor, status)
+func handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Server running")
 }
+
+func versionString() string {
+	return fmt.Sprintf("gin-doi-prototpye %d.%d %s", major, minor, status)
+}
+
+var port = ":8083"
 
 const doc = `Prototype for the G-Node Infrastructure DOI service
 
 Usage:
-  gin-doi [--conf <dir>]
-  gin-doi -h | --help
-  gin-doi --version
+  gin-doi-prototype [--conf <dir>] [--listen <address>]
+  gin-doi-prototype -h | --help
+  gin-doi-prototype --version
 
 Options:
-  --conf <dir>    Path to the configuration files directory. By default
-                  gin-doi will use the resources/conf directory.
-  -h --help       Show this screen.
-  --version       Print gin-doi version`
+  -h --help           Show this screen.
+  --version           Print version.
+  --conf <dir>        Path to the configuration files directory. default: ./resources/conf
+  --listen <address>  Address to listen at [default: :8083]
+  `
 
 func main() {
-	args, _ := docopt.Parse(doc, nil, true, versionString(), false)
+	args, err := docopt.Parse(doc, nil, true, versionString(), false)
 
-	if config, ok := args["--conf"]; ok && config != nil {
-		fmt.Printf("Use external config file: %v\n", config)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[Error] Parsing command line: %v\n", err)
+		os.Exit(-1)
 	}
 
-	fmt.Println("Start server")
+	fmt.Printf("[Starting server] arguments: %v\n", args)
+
+	if config, ok := args["--conf"]; ok && config != nil {
+		fmt.Printf("[Starting server] Use external config file: %v\n", config)
+	}
+
+	if p, ok := args["--listen"]; ok {
+		fmt.Printf("[Starting server] Use port: %s\n", p)
+		port = args["--listen"].(string)
+	}
+
+	fmt.Println("[Starting server] Listen and serve")
+	http.HandleFunc("/", handler)
+	err = http.ListenAndServe(port, nil)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[Error] Server startup: %v\n", err)
+		os.Exit(-1)
+	}
 }
