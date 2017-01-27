@@ -14,6 +14,7 @@ import (
 	"os"
 
 	"github.com/docopt/docopt-go"
+	"github.com/gorilla/mux"
 )
 
 const (
@@ -65,11 +66,20 @@ func main() {
 		port = args["--listen"].(string)
 	}
 
+	fmt.Println("[Starting server] Registering routes")
+	router := mux.NewRouter()
+	router.HandleFunc("/", handler)
+
+	server := http.Server{
+		Addr:    port,
+		Handler: router,
+	}
+
 	fmt.Println("[Starting server] Listen and serve")
-	http.HandleFunc("/", handler)
-	err = http.ListenAndServe(port, nil)
+	err = server.ListenAndServe()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "[Error] Server startup: %v\n", err)
 		os.Exit(-1)
 	}
+
 }
