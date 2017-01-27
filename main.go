@@ -24,7 +24,11 @@ const (
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Server running")
+	fmt.Fprintln(w, "DOI Server running")
+}
+
+func authenticate(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Authenticate request")
 }
 
 func versionString() string {
@@ -68,7 +72,7 @@ func main() {
 
 	fmt.Println("[Starting server] Registering routes")
 	router := mux.NewRouter()
-	router.HandleFunc("/", handler)
+	RegisterRoutes(router)
 
 	server := http.Server{
 		Addr:    port,
@@ -81,5 +85,4 @@ func main() {
 		fmt.Fprintf(os.Stderr, "[Error] Server startup: %v\n", err)
 		os.Exit(-1)
 	}
-
 }
