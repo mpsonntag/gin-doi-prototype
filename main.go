@@ -23,14 +23,6 @@ const (
 	status = "Alpha"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "DOI Server running")
-}
-
-func authenticate(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Authenticate request")
-}
-
 func versionString() string {
 	return fmt.Sprintf("gin-doi-prototpye %d.%d %s", major, minor, status)
 }

@@ -8,10 +8,15 @@
 
 package main
 
-import "github.com/gorilla/mux"
+import (
+	"fmt"
+	"net/http"
+)
 
-// RegisterRoutes does exactly that.
-func RegisterRoutes(r *mux.Router) {
-	r.HandleFunc("/", Root)
-	r.HandleFunc("/authenticate", Authenticate)
+func Root(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "DOI Server running")
+}
+
+func Authenticate(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Authenticate request")
 }
